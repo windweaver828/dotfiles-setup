@@ -25,14 +25,12 @@ dot() {
     GIT_DIR=$HOME/.dot/.git/ GIT_WORK_TREE=$HOME /usr/bin/git "$@"
 }
 
-if [[ ! -e $HOME/.dot ]]; then
-    echo "Cloning dotfiles to ${HOME}/.dot"
-    git clone --no-checkout https://windweaver828@bitbucket.org/windweaver828/dotfiles.git $HOME/.dot >/dev/null 2>&1
-    dot checkout
-    echo "Cloning dotfiles submodules"
-    dot submodule update --init --recursive --force >/dev/null 2>&1
-    dot config --local status.showUntrackedFiles no
-fi
+echo "Cloning dotfiles to ${HOME}/.dot"
+git clone --no-checkout https://windweaver828@bitbucket.org/windweaver828/dotfiles.git $HOME/.dot >/dev/null 2>&1 || { echo "Cloning failed, exit..."; exit 1 }
+dot checkout
+echo "Cloning dotfiles submodules"
+dot submodule update --init --recursive --force >/dev/null 2>&1
+dot config --local status.showUntrackedFiles no
 
 # Install oh-my-zsh and custom files
 rm -rf $HOME/.oh-my-zsh/custom
