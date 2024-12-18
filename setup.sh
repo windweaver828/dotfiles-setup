@@ -39,11 +39,11 @@ rm -rf $HOME/.oh-my-zsh/custom
 ln -s $HOME/.dotfiles/oh-my-zsh-custom $HOME/.oh-my-zsh/custom
 
 # List of packages needed to be installed
-dependencies=("curl zsh tmux git lsd bat ncurses-term neovim")
+dependencies=("curl zsh tmux git lsd bat fontconfig ncurses-term neovim")
 IFS=' ' read -ra dependencies <<< $dependencies # convert to array
 need_install=""
 # If apt available, install dependencies
-if [[ -n $(which apt) ]]; then
+if [[ -n $(which apt 2>/dev/null) ]]; then
     echo "Found apt - checking and installing recommended packages"
     for package in "${dependencies[@]}"; do
         if ! dpkg -l | grep -q "^ii  $package "; then
@@ -57,7 +57,7 @@ if [[ -n $(which apt) ]]; then
     else
         echo "No packages missing"
     fi
-    if [[ -z $(which lsd) ]]; then
+    if [[ -z $(which lsd 2>/dev/null) ]]; then
         echo "Failed to install lsd, install manually"
         echo "https://github.com/lsd-rs/lsd/releases"
     fi
