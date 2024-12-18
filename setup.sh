@@ -23,7 +23,7 @@ echo "Setting up dev environment"
 
 if [[ ! -e $HOME/.dot ]]; then
     git clone --no-checkout https://windweaver828@bitbucket.org/windweaver828/dotfiles.git $HOME/.dot
-    dot='/usr/bin/git --git-dir=$HOME/.dot/.git --work-tree=$HOME'
+    dot='/usr/bin/git --git-dir=$HOME/.dot/.git/ --work-tree=$HOME'
     ${dot} checkout
     ${dot} submodule update --init --recursive --force
     ${dot} config --local status.showUntrackedFiles no
