@@ -26,9 +26,9 @@ dot() {
 }
 
 if [[ ! -e $HOME/.dot ]]; then
-    git clone --no-checkout https://windweaver828@bitbucket.org/windweaver828/dotfiles.git $HOME/.dot
+    git clone --no-checkout https://windweaver828@bitbucket.org/windweaver828/dotfiles.git $HOME/.dot >/dev/null 2>&1
     dot checkout
-    dot submodule update --init --recursive --force
+    dot submodule update --init --recursive --force >/dev/null 2>&1
     dot config --local status.showUntrackedFiles no
 fi
 
@@ -75,12 +75,12 @@ if [[ -n $(which fc-cache) ]]; then
             echo "/usr/local/share/fonts not found, you will need to install the FiraCodeNerdFont fonts manually"
         fi
     fi
+else
     echo "fc-cache not found, you will need to install the FiraCodeNerdFont fonts manually"
 fi
 
 # Open and close nvim to install lazy and all plugins
 nvim --headless -c 'qa' >/dev/null 2>&1
 
-
-source $HOME/.zshrc
+exec zsh
 echo "Installation Complete"
