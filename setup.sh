@@ -67,7 +67,7 @@ else
 fi
 
 # Install FiraCode Fonts
-if [[ -n $(which fc-cache) ]]; then
+if [[ -n $(which fc-cache 2>/dev/null) ]]; then
     if [[ -z $(fc-list | grep -i "firacode") ]]; then
         if [ -d /usr/local/share/fonts ]; then
             echo "Installing FiraCode NerdFonts"
