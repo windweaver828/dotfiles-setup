@@ -23,7 +23,8 @@ echo "Setting up dev environment"
 
 if [[ ! -e $HOME/.dot ]]; then
     # >/dev/null 2>&1
-    git clone --no-checkout https://windweaver828@bitbucket.org/windweaver828/dotfiles.git $HOME/.dot || { echo "Cloning failed. Exiting..."; exit 1; }
+    git clone --no-checkout https://windweaver828@bitbucket.org/windweaver828/dotfiles.git $HOME/.dot
+    shopt -s expand_aliases # Required to be able to define and use aliases in the script
     alias dot='/usr/bin/git --git-dir=$HOME/.dot/.git/ --work-tree=$HOME'
     dot restore .
     dot submodule update --init --recursive --force
