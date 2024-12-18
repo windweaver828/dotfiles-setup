@@ -23,7 +23,7 @@ echo "Setting up dev environment"
 
 if [[ ! -e $HOME/.dot ]]; then
     # >/dev/null 2>&1
-    git clone --no-checkout https://windweaver828@bitbucket.org/windweaver828/dotfiles.git $HOME/.dot
+    git clone --no-checkout https://windweaver828@bitbucket.org/windweaver828/dotfiles.git $HOME/.dot || { echo "Cloning failed. Exiting..."; exit 1; }
     alias dot='/usr/bin/git --git-dir=$HOME/.dot/.git/ --work-tree=$HOME'
     dot restore .
     dot submodule update --init --recursive --force
@@ -35,7 +35,7 @@ rm -rf $HOME/.oh-my-zsh/custom
 ln -s $HOME/.dotfiles/oh-my-zsh-custom $HOME/.oh-my-zsh/custom
 
 # List of packages needed to be installed
-dependencies=("curl zsh tmux git lsd bat fonts-powerline ncurses-term neovim")
+dependencies=("curl zsh tmux git lsd bat ncurses-term neovim")
 IFS=' ' read -ra dependencies <<< $dependencies # convert to array
 need_install=""
 # If apt available, install dependencies
