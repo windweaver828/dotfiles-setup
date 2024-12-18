@@ -82,5 +82,5 @@ fi
 # Open and close nvim to install lazy and all plugins
 nvim --headless -c 'qa' >/dev/null 2>&1
 
-exec zsh
 echo "Installation Complete"
+exec zsh
