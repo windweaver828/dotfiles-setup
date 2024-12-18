@@ -21,12 +21,15 @@ fi
 
 echo "Setting up dev environment"
 
+dot() {
+    GIT_DIR=$HOME/.dot/.git/ GIT_WORK_TREE=$HOME /usr/bin/git "$@"
+}
+
 if [[ ! -e $HOME/.dot ]]; then
     git clone --no-checkout https://windweaver828@bitbucket.org/windweaver828/dotfiles.git $HOME/.dot
-    dot='/usr/bin/git --git-dir=$HOME/.dot/.git/ --work-tree=$HOME'
-    ${dot} checkout
-    ${dot} submodule update --init --recursive --force
-    ${dot} config --local status.showUntrackedFiles no
+    dot checkout
+    dot submodule update --init --recursive --force
+    dot config --local status.showUntrackedFiles no
 fi
 
 # Install oh-my-zsh and custom files
