@@ -23,11 +23,10 @@ echo "Setting up dev environment"
 
 if [[ ! -e $HOME/.dot ]]; then
     git clone --no-checkout https://windweaver828@bitbucket.org/windweaver828/dotfiles.git $HOME/.dot
-    shopt -s expand_aliases # Required to be able to define and use aliases in the script
-    alias dot='/usr/bin/git --git-dir=$HOME/.dot/.git/ --work-tree=$HOME'
-    dot restore .
-    dot submodule update --init --recursive --force
-    dot config --local status.showUntrackedFiles no
+    dot='/usr/bin/git --git-dir=$HOME/.dot/.git/ --work-tree=$HOME'
+    ${dot} restore .
+    ${dot} submodule update --init --recursive --force
+    ${dot} config --local status.showUntrackedFiles no
 fi
 
 # Install oh-my-zsh and custom files
