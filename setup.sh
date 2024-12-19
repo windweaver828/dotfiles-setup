@@ -21,6 +21,25 @@ fi
 
 echo "Setting up dev environment"
 
+# Check if we are root
+[ "$(id -u)" -eq 0 ] && IS_ROOT=true || IS_ROOT=false
+
+# Function to check if a given package is installed
+is_package_installed() {
+    package="$1"
+    case "$package_manager" in
+        apt|pkg)
+            dpkg-query -W -f='${Status}' "$package" 2>/dev/null
+            ;;
+        rpm-ostree|yum|dnf)
+            rpm -q "$package" 2>/dev/null
+            ;;
+        pamac|pacman)
+            pacman -Q "$package" 2>/dev/null
+            ;;
+    esac
+}
+
 dot() {
     GIT_DIR=$HOME/.dot/.git/ GIT_WORK_TREE=$HOME /usr/bin/git "$@"
 }
@@ -36,71 +55,66 @@ dot config --local status.showUntrackedFiles no
 rm -rf $HOME/.oh-my-zsh/custom
 ln -s $HOME/.dotfiles/oh-my-zsh-custom $HOME/.oh-my-zsh/custom
 
-# # Get name of linux os
-# source /etc/os-release
+# Check and install recommended programs
+dependencies=("curl" "zsh" "tmux" "git" "lsd" "bat" "fontconfig" "ncurses-term" "neovim")
 
-# if [[ ${NAME} == "Ubuntu" ]]; then
-#     echo "Found Ubuntu"
-# elif [[ ${NAME} == "Fedora Linux" ]]; then
-#     echo "Found Fedora"
-# fi
-
-# Check if we are root
-[ "$(id -u)" -eq 0 ] && is_root=true || is_root=false
-
-# List of packages needed to be installed
-dependencies=("curl zsh tmux git lsd bat fontconfig ncurses-term neovim")
-IFS=' ' read -ra dependencies <<< $dependencies # convert to array
-need_install=""
-# If apt available, install dependencies
-if [[ -n $(which apt 2>/dev/null) ]]; then
-    echo "Found apt - checking and installing recommended packages"
-    for package in "${dependencies[@]}"; do
-        if ! dpkg -l | grep -q "^ii  $package "; then
-            need_install+="$package ";
-        fi
-    done
-    if [[ -n ${need_install} ]]; then
-        echo "Installing packages: ${need_install}"
-        if ${is_root}; then
-            apt update >/dev/null 2>&1
-            apt install -y ${need_install} >/dev/null 2>&1
-        else
-            sudo apt update >/dev/null 2>&1
-            sudo apt install -y ${need_install} >/dev/null 2>&1
-        fi
-    else
-        echo "No packages missing"
+if command -v pkg >/dev/null 2>&1; then
+    package_manager="pkg"
+    install_command="pkg install -y ${dependencies[@]}"
+elif command -v ap >/dev/null 2>&1; then
+    package_manager="apt"
+    install_command="apt install -y ${dependencies[@]}"
+elif command -v rpm-ostree >/dev/null 2>&1; then
+    package_manager="rpm-ostree"
+    dependencies+=("glibc-langpack-en" "gcc")
+    install_command="rpm-ostree install -y ${dependencies[@]}"
+elif command -v pamac >/dev/null 2>&1; then
+    package_manager="pamac"
+    install_command="pamac install -y ${dependencies[@]}"
+fi
+# Add sudo to install_command if we aren't root
+if [[ -n ${install_command} ]]; then
+    if ! ${IS_ROOT}; then
+        install_command="sudo ${install_command}"
     fi
-    if [[ -z $(which lsd 2>/dev/null) ]]; then
-        echo "Failed to install lsd, install manually"
-        echo "https://github.com/lsd-rs/lsd/releases"
-    fi
-elif [[ -n $(which rpm-ostree 2>/dev/null) ]]; then
-    echo "Found rpm-ostree - checking and installing recommended packages"
-    dependencies+=
+    # Run the install command
+    ${install_command}
 else
-    echo "System does not use apt, you will need to ensure packages are installed manually"
-    echo ${dependencies[@]}
+    echo "No supported package manager found, you will have to install the below dependencies manually"
+    echo ${dependencies}
+fi
+
+# Determine which packages are not installed still
+not_installed=()
+for package in "${dependencies[@]}"; do
+    [[ -n $(is_package_installed ${package}) ]] || not_installed+=("${package}")
+done
+if [[ -n ${not_installed} ]]; then
+    echo "Failed to install: ${not_installed[@]}"
 fi
 
 # Install FiraCode Fonts
-if [[ -n $(which fc-cache 2>/dev/null) ]]; then
-    if [[ -z $(fc-list | grep -i "firacode") ]]; then
-        if [ -d /usr/local/share/fonts ]; then
-            echo "Installing FiraCode NerdFonts"
-            if ${is_root}; then
-                cp $HOME/.dotfiles/FiraCodeNerdFont/*.ttf /usr/local/share/fonts/
-            else
-                sudo cp $HOME/.dotfiles/FiraCodeNerdFont/*.ttf /usr/local/share/fonts/
-            fi
-            fc-cache -fv >/dev/null 2>&1
-        else
-            echo "/usr/local/share/fonts not found, you will need to install the FiraCodeNerdFont fonts manually"
-        fi
-    fi
+if [[ ${package_manager} == "pkg" ]]; then
+    [[ -d $HOME/.termux ]] || mkdir -p $HOME/.termux
+    cp $HOME/.dotfiles/FiraCodeNerdFont/FiraCodeNerdFont-Regular.ttf $HOME/.termux/font.ttf
 else
-    echo "fc-cache not found, you will need to install the FiraCodeNerdFont fonts manually"
+    if [[ -n $(command -v fc-cache 2>/dev/null) ]]; then
+        if [[ -z $(fc-list | grep -i "firacode") ]]; then
+            if [ -d /usr/local/share/fonts ]; then
+                echo "Installing FiraCode NerdFonts"
+                if ${IS_ROOT}; then
+                    cp $HOME/.dotfiles/FiraCodeNerdFont/*.ttf /usr/local/share/fonts/
+                else
+                    sudo cp $HOME/.dotfiles/FiraCodeNerdFont/*.ttf /usr/local/share/fonts/
+                fi
+                fc-cache -fv >/dev/null 2>&1
+            else
+                echo "/usr/local/share/fonts not found, you will need to install the FiraCodeNerdFont fonts manually"
+            fi
+        fi
+    else
+        echo "fc-cache not found, you will need to install the FiraCodeNerdFont fonts manually"
+    fi
 fi
 
 # Open and close nvim to install lazy and all plugins
