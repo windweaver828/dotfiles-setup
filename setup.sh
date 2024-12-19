@@ -36,6 +36,18 @@ dot config --local status.showUntrackedFiles no
 rm -rf $HOME/.oh-my-zsh/custom
 ln -s $HOME/.dotfiles/oh-my-zsh-custom $HOME/.oh-my-zsh/custom
 
+# # Get name of linux os
+# source /etc/os-release
+
+# if [[ ${NAME} == "Ubuntu" ]]; then
+#     echo "Found Ubuntu"
+# elif [[ ${NAME} == "Fedora Linux" ]]; then
+#     echo "Found Fedora"
+# fi
+
+# Check if we are root
+[ "$(id -u)" -eq 0 ] && is_root=true || is_root=false
+
 # List of packages needed to be installed
 dependencies=("curl zsh tmux git lsd bat fontconfig ncurses-term neovim")
 IFS=' ' read -ra dependencies <<< $dependencies # convert to array
@@ -50,8 +62,13 @@ if [[ -n $(which apt 2>/dev/null) ]]; then
     done
     if [[ -n ${need_install} ]]; then
         echo "Installing packages: ${need_install}"
-        sudo apt update >/dev/null 2>&1
-        sudo apt install -y ${need_install} >/dev/null 2>&1
+        if ${is_root}; then
+            apt update >/dev/null 2>&1
+            apt install -y ${need_install} >/dev/null 2>&1
+        else
+            sudo apt update >/dev/null 2>&1
+            sudo apt install -y ${need_install} >/dev/null 2>&1
+        fi
     else
         echo "No packages missing"
     fi
@@ -59,9 +76,12 @@ if [[ -n $(which apt 2>/dev/null) ]]; then
         echo "Failed to install lsd, install manually"
         echo "https://github.com/lsd-rs/lsd/releases"
     fi
+elif [[ -n $(which rpm-ostree 2>/dev/null) ]]; then
+    echo "Found rpm-ostree - checking and installing recommended packages"
+    dependencies+=
 else
     echo "System does not use apt, you will need to ensure packages are installed manually"
-    echo ${dependencies}
+    echo ${dependencies[@]}
 fi
 
 # Install FiraCode Fonts
@@ -69,7 +89,11 @@ if [[ -n $(which fc-cache 2>/dev/null) ]]; then
     if [[ -z $(fc-list | grep -i "firacode") ]]; then
         if [ -d /usr/local/share/fonts ]; then
             echo "Installing FiraCode NerdFonts"
-            cp $HOME/.dotfiles/FiraCodeNerdFont/*.ttf /usr/local/share/fonts/
+            if ${is_root}; then
+                cp $HOME/.dotfiles/FiraCodeNerdFont/*.ttf /usr/local/share/fonts/
+            else
+                sudo cp $HOME/.dotfiles/FiraCodeNerdFont/*.ttf /usr/local/share/fonts/
+            fi
             fc-cache -fv >/dev/null 2>&1
         else
             echo "/usr/local/share/fonts not found, you will need to install the FiraCodeNerdFont fonts manually"
