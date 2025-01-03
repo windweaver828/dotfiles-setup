@@ -37,7 +37,7 @@ rm -rf $HOME/.oh-my-zsh/custom
 ln -s $HOME/.dotfiles/oh-my-zsh-custom $HOME/.oh-my-zsh/custom
 
 # List of packages needed to be installed
-dependencies=("curl zsh tmux git lsd bat fontconfig ncurses-term neovim")
+dependencies=("curl fd-find ripgrep zsh tmux git lsd bat fontconfig ncurses-term neovim")
 IFS=' ' read -ra dependencies <<< $dependencies # convert to array
 need_install=""
 # If apt available, install dependencies
