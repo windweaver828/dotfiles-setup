@@ -31,6 +31,8 @@ dot checkout
 echo "Cloning dotfiles submodules"
 dot submodule update --init --recursive --force >/dev/null 2>&1
 dot config --local status.showUntrackedFiles no
+# Stop checking .git-credentials for changes
+dot update-index --assume-unchanged $HOME/.git-credentials
 
 # Install oh-my-zsh and custom files
 rm -rf $HOME/.oh-my-zsh/custom
