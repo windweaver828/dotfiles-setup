@@ -48,19 +48,18 @@ dependencies=("curl fontconfig git") # General required tools
 dependencies+=(" bat lsd ncurses-term tmux zsh") # For shell environment
 dependencies+=(" fd-find neovim ripgrep") # For neovim & plugins
 IFS=' ' read -ra dependencies <<< $dependencies # convert to array
-need_install=""
+need_install=()
 # If apt available, install dependencies
 if [[ -n $(command -v apt 2>/dev/null) ]]; then
-    echo "Found apt - checking and installing recommended packages"
     for package in "${dependencies[@]}"; do
-        if ! dpkg -l | grep -q "^ii  $package "; then
-            need_install+="$package ";
+        if [[ ! dpkg -l | grep -q "^ii  ${package} " ]]; then
+            need_install+=("${package}");
         fi
     done
     if [[ -n ${need_install} ]]; then
-        echo "Installing packages: ${need_install}"
+        echo "Installing packages via apt: ${need_install[*]}"
         sudo apt update >/dev/null 2>&1
-        sudo apt install -y ${need_install} >/dev/null 2>&1
+        sudo apt install -y ${need_install[@]} >/dev/null 2>&1
     fi
 else
     echo "System does not use apt, you will need to ensure packages are installed manually"
@@ -69,7 +68,8 @@ fi
 
 pip_dependencies=("pyright" "flake8" "black")
 if [[ -n $(command -v pip) ]] then
-  pip install "${pip_dependencies[@]}"
+  echo "Installing pip dependencies"
+  pip install "${pip_dependencies[@]}" >/dev/null 2>&1
 else
   echo "pip not found, you will need to install python pip and the following dependencies"
   echo "${pip_dependencies[*]}"
