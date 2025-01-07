@@ -66,6 +66,7 @@ else
     echo ${dependencies[@]}
 fi
 
+# Install pip dependencies
 pip_dependencies=("pyright" "flake8" "black")
 if [[ -n $(command -v pip) ]] then
   echo "Installing pip dependencies"
