@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# Print the password to the screen before deleting everything, if available
+if [[ -e $HOME/.git-credentials ]] then
+  cat $HOME/.git-credentials
+fi
+
 # Delete all the dotfiles
 cd $HOME
 rm -rf .dot .dotfiles .zsh_history .zshrc .zcompdump* .tmux .tmux.conf .oh-my-zsh .pylintrc .gitignore .git-credentials .gitconfig .gitmodules .config/lsd .config/nvim .local/share/nvim
@@ -19,7 +24,7 @@ if [[ ${1} == "clean" ]]; then
     exit
 fi
 
-echo "Setting up dev environment"
+echo "Setting up environment"
 
 dot() {
     GIT_DIR=$HOME/.dot/.git/ GIT_WORK_TREE=$HOME /usr/bin/git "$@"
@@ -39,11 +44,13 @@ rm -rf $HOME/.oh-my-zsh/custom
 ln -s $HOME/.dotfiles/oh-my-zsh-custom $HOME/.oh-my-zsh/custom
 
 # List of packages needed to be installed
-dependencies=("curl fd-find ripgrep zsh tmux git lsd bat fontconfig ncurses-term neovim")
+dependencies=("curl fontconfig git") # General required tools
+dependencies+=(" bat lsd ncurses-term tmux zsh") # For shell environment
+dependencies+=(" fd-find neovim ripgrep") # For neovim & plugins
 IFS=' ' read -ra dependencies <<< $dependencies # convert to array
 need_install=""
 # If apt available, install dependencies
-if [[ -n $(which apt 2>/dev/null) ]]; then
+if [[ -n $(command -v apt 2>/dev/null) ]]; then
     echo "Found apt - checking and installing recommended packages"
     for package in "${dependencies[@]}"; do
         if ! dpkg -l | grep -q "^ii  $package "; then
@@ -54,20 +61,22 @@ if [[ -n $(which apt 2>/dev/null) ]]; then
         echo "Installing packages: ${need_install}"
         sudo apt update >/dev/null 2>&1
         sudo apt install -y ${need_install} >/dev/null 2>&1
-    else
-        echo "No packages missing"
-    fi
-    if [[ -z $(which lsd 2>/dev/null) ]]; then
-        echo "Failed to install lsd, install manually"
-        echo "https://github.com/lsd-rs/lsd/releases"
     fi
 else
     echo "System does not use apt, you will need to ensure packages are installed manually"
-    echo ${dependencies}
+    echo ${dependencies[@]}
+fi
+
+pip_dependencies=("pyright" "flake8" "black")
+if [[ -n $(command -v pip) ]] then
+  pip install "${pip_dependencies[@]}"
+else
+  echo "pip not found, you will need to install python pip and the following dependencies"
+  echo "${pip_dependencies[*]}"
 fi
 
 # Install FiraCode Fonts
-if [[ -n $(which fc-cache 2>/dev/null) ]]; then
+if [[ -n $(command -v fc-cache 2>/dev/null) ]]; then
     if [[ -z $(fc-list | grep -i "firacode") ]]; then
         if [ -d /usr/local/share/fonts ]; then
             echo "Installing FiraCode NerdFonts"
