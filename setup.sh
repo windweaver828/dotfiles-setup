@@ -52,7 +52,7 @@ need_install=()
 # If apt available, install dependencies
 if [[ -n $(command -v apt 2>/dev/null) ]]; then
     for package in "${dependencies[@]}"; do
-        if [[ ! dpkg -l | grep -q "^ii  ${package} " ]]; then
+        if ! dpkg -l | grep -q "^ii  ${package} "; then
             need_install+=("${package}");
         fi
     done
