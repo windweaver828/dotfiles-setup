@@ -39,10 +39,6 @@ dot config --local status.showUntrackedFiles no
 # Stop checking .git-credentials for changes
 dot update-index --assume-unchanged $HOME/.git-credentials
 
-# Install oh-my-zsh and custom files
-rm -rf $HOME/.oh-my-zsh/custom
-ln -s $HOME/.dotfiles/oh-my-zsh-custom $HOME/.oh-my-zsh/custom
-
 # List of packages needed to be installed
 dependencies=("curl fontconfig git") # General required tools
 dependencies+=(" bat lsd ncurses-term tmux zsh") # For shell environment
