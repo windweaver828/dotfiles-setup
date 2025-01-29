@@ -7,7 +7,7 @@ fi
 
 # Delete all the dotfiles
 cd $HOME
-rm -rf .dot .dotfiles .zsh_history .zshrc .zcompdump* .tmux .tmux.conf .oh-my-zsh .pylintrc .gitignore .git-credentials .gitconfig .gitmodules .config/lsd .config/nvim .local/share/nvim
+rm -rf .dot .dotfiles .zsh_history .zshrc .zcompdump* .tmux .tmux.conf .oh-my-zsh .pylintrc .gitignore .git-credentials .gitconfig .gitmodules .config/lazygit .config/lsd .config/nvim .local/share/nvim
 
 if [[ ${1} == "clean" ]]; then
   echo "Cleaning up dev environment"
