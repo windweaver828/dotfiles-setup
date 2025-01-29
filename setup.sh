@@ -43,38 +43,44 @@ dot config --local status.showUntrackedFiles no
 dot update-index --assume-unchanged $HOME/.git-credentials
 
 # List of packages needed to be installed
-dependencies=("curl fontconfig git")                    # General required tools
+dependencies=("curl git")                               # General required tools
 dependencies+=(" bat lsd ncurses-term tmux zoxide zsh") # For shell environment
 dependencies+=(" fd-find neovim ripgrep")               # For neovim & plugins
 dependencies+=(" npm cargo")                            # For neovim lsps
 IFS=' ' read -ra dependencies <<<$dependencies          # convert to array
-need_install=()
-# If apt available, install dependencies
-if [[ -n $(command -v apt 2>/dev/null) ]]; then
-  for package in "${dependencies[@]}"; do
-    if ! dpkg -l | grep -q "^ii  ${package} "; then
-      need_install+=("${package}")
-    fi
-  done
-  if [[ -n ${need_install} ]]; then
-    echo "Installing packages via apt: ${need_install[*]}"
-    sudo apt update >/dev/null 2>&1
-    sudo apt install -y ${need_install[@]} >/dev/null 2>&1
-  fi
-else
-  echo "System does not use apt, you will need to ensure packages are installed manually"
-  echo ${dependencies[@]}
-fi
+# need_install=()
+# # If apt available, install dependencies
+# if [[ -n $(command -v apt 2>/dev/null) ]]; then
+#   for package in "${dependencies[@]}"; do
+#     if ! dpkg -l | grep -q "^ii  ${package} "; then
+#       need_install+=("${package}")
+#     fi
+#   done
+#   if [[ -n ${need_install} ]]; then
+#     echo "Installing packages via apt: ${need_install[*]}"
+#     sudo apt update >/dev/null 2>&1
+#     sudo apt install -y ${need_install[@]} >/dev/null 2>&1
+#   fi
+# else
+#   echo "System does not use apt, you will need to ensure packages are installed manually"
+#   echo ${dependencies[@]}
+# fi
 
-# Install pip dependencies
-pip_dependencies=("pyright" "flake8" "black")
-if [[ -n $(command -v pip) ]]; then
-  echo "Installing pip dependencies"
-  pip install "${pip_dependencies[@]}" >/dev/null 2>&1
-else
-  echo "pip not found, you will need to install python pip and the following dependencies"
-  echo "${pip_dependencies[*]}"
-fi
+# # Install pip dependencies
+# pip_dependencies=()
+# pip_dependencies=("pyright" "flake8" "black")
+# if [[ -n $(command -v pip) ]]; then
+#   echo "Installing pip dependencies"
+#   pip install "${pip_dependencies[@]}" >/dev/null 2>&1
+# else
+#   echo "pip not found, you will need to install python pip and the following dependencies"
+#   echo "${pip_dependencies[*]}"
+# fi
+
+# # Install zoxide
+# if not [[ -z $(command -v zoxide) ]]; then
+#   curl -sS https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | bash
+# fi
 
 # Install FiraCode Fonts
 if [[ -n $(command -v fc-cache 2>/dev/null) ]]; then
@@ -95,4 +101,7 @@ fi
 nvim --headless -c 'qa' >/dev/null 2>&1
 
 echo "Installation Complete"
+echo
+echo "Ensure the below packages are installed for full functionality"
+echo ${dependencies[@]}
 exec zsh
