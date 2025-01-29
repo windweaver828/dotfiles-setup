@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Print the password to the screen before deleting everything, if available
+# Print the password to the screen before deleting everything, if it exists
 if [[ -e $HOME/.git-credentials ]]; then
   cat $HOME/.git-credentials
 fi
