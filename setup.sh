@@ -97,11 +97,16 @@ else
   echo "fc-cache not found, you will need to install the FiraCodeNerdFont fonts manually"
 fi
 
+# Install any missing tmux plugins
+$HOME/.tmux/plugins/tpm/bin/install_plugins >/dev/null
+
 # Open and close nvim to install lazy and all plugins
 nvim --headless -c 'qa' >/dev/null 2>&1
 
 echo "Installation Complete"
 echo
+
 echo "Ensure the below packages are installed for full functionality"
 echo ${dependencies[@]}
+
 exec zsh
