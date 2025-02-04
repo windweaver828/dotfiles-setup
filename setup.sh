@@ -46,7 +46,7 @@ dot update-index --assume-unchanged $HOME/.git-credentials
 dependencies=("curl git")                               # General required tools
 dependencies+=(" bat lsd ncurses-term tmux zoxide zsh") # For shell environment
 dependencies+=(" fd-find neovim ripgrep")               # For neovim & plugins
-dependencies+=(" npm cargo")                            # For neovim lsps
+dependencies+=(" make npm cargo")                       # For neovim lsps, ai
 IFS=' ' read -ra dependencies <<<$dependencies          # convert to array
 # need_install=()
 # # If apt available, install dependencies
