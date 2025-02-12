@@ -42,12 +42,16 @@ dot config --local status.showUntrackedFiles no
 # Stop checking .git-credentials for changes
 dot update-index --assume-unchanged $HOME/.git-credentials
 
+# Install Homebrew
+# /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
 # List of packages needed to be installed
-dependencies=("curl git")                               # General required tools
-dependencies+=(" bat lsd ncurses-term tmux zoxide zsh") # For shell environment
-dependencies+=(" fd-find neovim ripgrep")               # For neovim & plugins
-dependencies+=(" make npm cargo")                       # For neovim lsps, ai
-IFS=' ' read -ra dependencies <<<$dependencies          # convert to array
+dependencies=("curl git")                                # General required tools
+dependencies+=(" pkg-config libssl-dev build-essential") # For homebrew/linuxbrew
+dependencies+=(" bat lsd ncurses-term tmux zoxide zsh")  # For shell environment
+dependencies+=(" fd-find neovim ripgrep")                # For neovim & plugins
+dependencies+=(" make npm cargo")                        # For neovim lsps, ai
+IFS=' ' read -ra dependencies <<<$dependencies           # convert to array
 # need_install=()
 # # If apt available, install dependencies
 # if [[ -n $(command -v apt 2>/dev/null) ]]; then
