@@ -46,6 +46,7 @@ dot update-index --assume-unchanged $HOME/.git-credentials
 # /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
 # List of packages needed to be installed
+brew_installs = "neovim lsd fzf zoxide ripgrep"
 dependencies=("curl git")                                # General required tools
 dependencies+=(" pkg-config libssl-dev build-essential") # For homebrew/linuxbrew
 dependencies+=(" bat lsd ncurses-term tmux zoxide zsh")  # For shell environment
