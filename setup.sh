@@ -7,7 +7,9 @@ fi
 
 # Delete all the dotfiles
 cd $HOME
-rm -rf .dot .dotfiles .zsh_history .zshrc .zcompdump* .tmux .tmux.conf .oh-my-zsh .pylintrc .gitignore .git-credentials .gitconfig .gitmodules .config/lazygit .config/lsd .config/nvim .local/share/nvim
+rm -rf .dot .dotfiles .zsh_history .zshrc .zcompdump* .tmux .tmux.conf .oh-my-zsh .pylintrc
+rm -rf .gitignore .git-credentials .gitconfig .gitmodules
+rm -rf .config/lazygit .config/lsd .config/nvim .config/bat .local/share/nvim
 
 if [[ ${1} == "clean" ]]; then
   echo "Cleaning up dev environment"
@@ -107,6 +109,10 @@ $HOME/.tmux/plugins/tpm/bin/install_plugins >/dev/null
 
 # Open and close nvim to install lazy and all plugins
 nvim --headless -c 'qa' >/dev/null 2>&1
+
+# Build the bat cache if possible
+bat cache --build >/dev/null 2>&1
+batcat cache --build >/dev/null 2>&1
 
 echo "Installation Complete"
 echo
