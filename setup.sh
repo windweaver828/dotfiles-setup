@@ -5,12 +5,6 @@ if [[ -e $HOME/.git-credentials ]]; then
   cat $HOME/.git-credentials
 fi
 
-# Delete all the dotfiles
-cd $HOME
-rm -rf .dot .dotfiles .zsh_history .zshrc .zcompdump* .tmux .tmux.conf .oh-my-zsh .pylintrc
-rm -rf .gitignore .git-credentials .gitconfig .gitmodules
-rm -rf .config/lazygit .config/lsd .config/nvim .config/bat .local/share/nvim
-
 if [[ ${1} == "clean" ]]; then
   echo "Cleaning up dev environment"
   SCRIPT_DIR=$(dirname "$(realpath "$0")")
@@ -37,7 +31,7 @@ git clone --no-checkout https://windweaver828@bitbucket.org/windweaver828/dotfil
   echo "Cloning failed..."
   exit 1
 }
-dot checkout
+dot checkout -f
 echo "Cloning dotfiles submodules"
 dot submodule update --init --recursive --force >/dev/null 2>&1
 dot config --local status.showUntrackedFiles no
@@ -45,60 +39,45 @@ dot config --local status.showUntrackedFiles no
 dot update-index --assume-unchanged $HOME/.git-credentials
 
 # Install Homebrew
-# /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+if [[ -z $(command -v brew) ]]; then
+  read -p "Homebrew is not installed. Do you want to install it? (y/n): " choice
+  if [[ "$choice" == [Yy]* ]]; then
+    echo "Installing Homebrew"
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  else
+    echo "Homebrew installation skipped."
+  fi
+fi
 
 # List of packages needed to be installed
-brew_installs = "neovim lsd fzf zoxide ripgrep nushell starship"
-dependencies=("curl git")                                # General required tools
-dependencies+=(" pkg-config libssl-dev build-essential") # For homebrew/linuxbrew
-dependencies+=(" bat lsd ncurses-term tmux zoxide zsh")  # For shell environment
-dependencies+=(" fd-find neovim ripgrep")                # For neovim & plugins
-dependencies+=(" make npm cargo")                        # For neovim lsps, ai
-IFS=' ' read -ra dependencies <<<$dependencies           # convert to array
-# need_install=()
-# # If apt available, install dependencies
-# if [[ -n $(command -v apt 2>/dev/null) ]]; then
-#   for package in "${dependencies[@]}"; do
-#     if ! dpkg -l | grep -q "^ii  ${package} "; then
-#       need_install+=("${package}")
-#     fi
-#   done
-#   if [[ -n ${need_install} ]]; then
-#     echo "Installing packages via apt: ${need_install[*]}"
-#     sudo apt update >/dev/null 2>&1
-#     sudo apt install -y ${need_install[@]} >/dev/null 2>&1
-#   fi
-# else
-#   echo "System does not use apt, you will need to ensure packages are installed manually"
-#   echo ${dependencies[@]}
-# fi
-
-# # Install pip dependencies
-# pip_dependencies=()
-# pip_dependencies=("pyright" "flake8" "black")
-# if [[ -n $(command -v pip) ]]; then
-#   echo "Installing pip dependencies"
-#   pip install "${pip_dependencies[@]}" >/dev/null 2>&1
-# else
-#   echo "pip not found, you will need to install python pip and the following dependencies"
-#   echo "${pip_dependencies[*]}"
-# fi
-
-# # Install zoxide
-# if not [[ -z $(command -v zoxide) ]]; then
-#   curl -sS https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | bash
-# fi
+brew_installs=("npm" "rust" "neovim" "lsd" "fzf" "zoxide" "ripgrep" "nushell" "starship")
+dependencies=(
+  "curl" "git"                                # General required tools
+  "pkg-config" "libssl-dev" "build-essential" # For homebrew/linuxbrew
+  "ncurses-term" "tmux" "zsh"                 # For shell environment
+  "make"                                      # For neovim lsps, ai
+)
 
 # Install FiraCode Fonts
-if [[ -n $(command -v fc-cache 2>/dev/null) ]]; then
-  if [[ -z $(fc-list | grep -i "firacode") ]]; then
-    if [ -d /usr/local/share/fonts ]; then
-      echo "Installing FiraCode NerdFonts"
-      cp $HOME/.dotfiles/FiraCodeNerdFont/*.ttf /usr/local/share/fonts/
-      fc-cache -fv >/dev/null 2>&1
-    else
-      echo "/usr/local/share/fonts not found, you will need to install the FiraCodeNerdFont fonts manually"
+if command -v fc-cache >/dev/null 2>&1; then
+  if ! fc-list | grep -qi "firacode"; then
+    FONT_DIR="$HOME/.local/share/fonts"
+    if [ ! -d "$FONT_DIR" ]; then
+      echo "Creating fonts directory at $FONT_DIR"
+      mkdir -p "$FONT_DIR"
     fi
+    echo "Installing FiraCode NerdFonts"
+    for font in "$HOME/.dotfiles/FiraCodeNerdFont/"*.ttf; do
+      cp "$font" "$FONT_DIR"
+    done
+    fc-cache -fv >/dev/null 2>&1
+    if fc-list | grep -qi "firacode"; then
+      echo "FiraCode NerdFonts installed successfully."
+    else
+      echo "Failed to install FiraCode NerdFonts. Please check manually."
+    fi
+  else
+    echo "FiraCode NerdFonts are already installed."
   fi
 else
   echo "fc-cache not found, you will need to install the FiraCodeNerdFont fonts manually"
@@ -119,5 +98,7 @@ echo
 
 echo "Ensure the below packages are installed for full functionality"
 echo ${dependencies[@]}
+echo "Installs using brew"
+echo ${brew_installs[@]}
 
 exec zsh
