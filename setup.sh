@@ -29,7 +29,7 @@ dot() {
 }
 
 echo "Cloning dotfiles to ${HOME}/.dot"
-git clone --no-checkout https://windweaver828@bitbucket.org/windweaver828/dotfiles.git $HOME/.dot || {
+git clone --no-checkout https://github.com/windweaver828/dotfiles.git $HOME/.dot || {
   echo "Cloning failed..."
   exit 1
 }
