@@ -52,7 +52,10 @@ if [[ -z $(command -v brew) ]]; then
 fi
 
 # List of packages needed to be installed
-brew_installs=("npm" "rust" "neovim" "lsd" "fzf" "zoxide" "ripgrep" "nushell" "starship")
+brew_installs=("npm" "rust" "neovim" "lazygit"
+  "lsd" "fzf" "zoxide" "ripgrep" "nushell" "starship"
+)
+
 dependencies=(
   "curl" "git"                                # General required tools
   "pkg-config" "libssl-dev" "build-essential" # For homebrew/linuxbrew
