@@ -1,6 +1,6 @@
 #!/bin/bash
 
-rm -rf $HOME/.dot
+rm -rf $HOME/.dot $HOME/.dotfiles $HOME/.oh-my-zsh $HOME/.tmux
 
 echo "Setting up environment"
 
