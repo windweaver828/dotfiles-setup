@@ -2,26 +2,6 @@
 
 rm -rf $HOME/.dot
 
-# Print the password to the screen before deleting everything, if it exists
-if [[ -e $HOME/.git-credentials ]]; then
-  cat $HOME/.git-credentials
-fi
-
-if [[ ${1} == "clean" ]]; then
-  echo "Cleaning up dev environment"
-  SCRIPT_DIR=$(dirname "$(realpath "$0")")
-  if [ -d /mnt/c/Users/Keith ]; then
-    echo "Showershop detected, removing extra files"
-    cd "$HOME"
-    rm -rf .viminfo* .zcompdump* .zsh_history projects/.git showershop/.git brandisgarage
-    cd /mnt/c/Users/Keith/
-    rm -rf .gitconfig .git-credentials passwords.json Documents/Projects/passwords.json
-  fi
-  rm -rf "$SCRIPT_DIR"
-  echo "Cleanup complete"
-  exit
-fi
-
 echo "Setting up environment"
 
 dot() {
@@ -33,7 +13,8 @@ git clone --no-checkout https://github.com/windweaver828/dotfiles.git $HOME/.dot
   echo "Cloning failed..."
   exit 1
 }
-dot checkout -f
+dot reset --hard
+dot checkout -f main
 echo "Cloning dotfiles submodules"
 dot submodule update --init --recursive --force >/dev/null 2>&1
 dot config --local status.showUntrackedFiles no
