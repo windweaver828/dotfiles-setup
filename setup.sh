@@ -35,13 +35,12 @@ fi
 # List of packages needed to be installed
 brew_installs=("npm" "rust" "neovim" "lazygit"
   "lsd" "fzf" "zoxide" "ripgrep" "nushell" "starship"
+  "curl" "git" "make"
 )
 
 dependencies=(
-  "curl" "git"                                # General required tools
   "pkg-config" "libssl-dev" "build-essential" # For homebrew/linuxbrew
-  "ncurses-term" "tmux" "zsh"                 # For shell environment
-  "make"                                      # For neovim lsps, ai
+  "ncurses-term" "zsh"                        # For shell environment
 )
 
 # Install FiraCode Fonts
